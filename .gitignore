@@ -1,0 +1,9 @@
+config.json
+data/
+work/
+__pycache__/
+*.pyc
+.env
+session-*.json
+referral-wallets.json
+farm.log

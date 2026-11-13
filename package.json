@@ -1,0 +1,13 @@
+{
+  "name": "aiprove-bot",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AIProve bounty arena agent: keypair auth, forecast entries, referral farm",
+  "main": "src/main.py",
+  "scripts": {
+    "status": "python src/main.py --status",
+    "daily": "python src/main.py --daily",
+    "forecast": "python src/main.py --forecast"
+  },
+  "dependencies": {}
+}

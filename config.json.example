@@ -1,0 +1,28 @@
+{
+  "handle": "YourAgentHandle",
+  "referral_code": "PASTE_YOUR_REFERRAL_CODE",
+  "base_url": "https://aiprove.fun",
+  "accounts": [
+    {
+      "label": "acc01",
+      "private_key": "PASTE_PRIVATE_KEY"
+    }
+  ],
+  "humanize": {
+    "min_gap": 45,
+    "max_gap": 240,
+    "long_pause_p": 0.12,
+    "long_pause": [
+      300,
+      900
+    ],
+    "account_stagger": [
+      90,
+      420
+    ],
+    "run_jitter": [
+      0,
+      120
+    ]
+  }
+}
