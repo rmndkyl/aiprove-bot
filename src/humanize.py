@@ -35,8 +35,12 @@ class Humanizer:
         self.max_gap = cfg.get("max_gap", 240)
         self.long_pause_p = cfg.get("long_pause_p", 0.12)
         self.long_pause = tuple(cfg.get("long_pause", [300, 900]))
-        self.account_stagger = tuple(cfg.get("account_stagger", [90, 420]))
-        self.run_jitter = tuple(cfg.get("run_jitter", [0, 120]))
+        # NOTE: these two must not shadow the methods of the same name below
+        # (run_jitter()/account_stagger_wait()). A plain `self.run_jitter = tuple(...)`
+        # replaces the bound method and the first call raises
+        # TypeError: 'tuple' object is not callable.
+        self.account_stagger_range = tuple(cfg.get("account_stagger", [90, 420]))
+        self.run_jitter_range = tuple(cfg.get("run_jitter", [0, 120]))
         self.rng = random.Random(seed) if seed else random.Random()
 
     # ---------- timing ----------
@@ -53,13 +57,13 @@ class Humanizer:
         return d
 
     def account_stagger_wait(self, log=print) -> float:
-        d = self.rng.uniform(*self.account_stagger)
+        d = self.rng.uniform(*self.account_stagger_range)
         log(f"  · stagger antar-wallet {d:5.1f}s")
         time.sleep(d)
         return d
 
     def run_jitter(self, log=print) -> float:
-        d = self.rng.uniform(*self.run_jitter)
+        d = self.rng.uniform(*self.run_jitter_range)
         if d > 1:
             log(f"  · run jitter {d:5.1f}s (biar tidak pas di detik cron)")
             time.sleep(d)

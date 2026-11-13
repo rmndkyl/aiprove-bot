@@ -85,6 +85,8 @@ def cmd_whoami(cfg):
     log(f"credit  : beta={me['credit']['beta']} credits={me['credit']['credits']} used={me['credit']['used']}")
     r = me["referral"]
     log(f"referral: {r['code']} -> {r['link']} (referred {r['referredCount']})")
+    slugs = {s["bountySlug"] for s in me["submissions"]}
+    log(f"submissions: {len(me['submissions'])} across {len(slugs)} bounties")
     return me
 
 
@@ -127,6 +129,23 @@ def cmd_enter(cfg, slugs=None):
     return done
 
 
+def _submitted_today(slug: str) -> bool:
+    """One forecast per bounty per UTC day.
+
+    The submit endpoint has no withdraw route and accepts duplicates, so a naive
+    24h cron accumulates entries (btc-tomorrow reached four on the first day). The
+    bounty instance itself is one per day, so one submission per slug per UTC date
+    is both enough and the shape a human competitor has.
+    """
+    today = time.strftime("%Y-%m-%d", time.gmtime())
+    for s in load_ledger().get("submissions", []):
+        if s.get("slug") != slug:
+            continue
+        if time.strftime("%Y-%m-%d", time.gmtime(s.get("ts", 0) / 1000)) == today:
+            return True
+    return False
+
+
 def cmd_forecast(cfg, dry=False, hz=None, jitter=True):
     ag = primary(cfg)
     H = Humanizer(cfg.get("humanize"), seed=None)
@@ -135,6 +154,9 @@ def cmd_forecast(cfg, dry=False, hz=None, jitter=True):
         try:
             plan = FC.plan_for(slug)
             if not plan:
+                continue
+            if not dry and _submitted_today(slug):
+                log(f"  = {slug:26} sudah submit hari ini, skip")
                 continue
             kind, sym, h = plan
             if kind in ("brier-crypto", "direction-eth"):
